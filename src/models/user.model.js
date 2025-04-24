@@ -35,7 +35,7 @@ userSchema.pre('save', async function (next) {
 
     //checking whether the password has been modified or not
     if (this.isModified("password")) {
-        this.password = await bycrpt.hash(this.password, 10);
+        this.password = await bcrypt.hash(this.password, 10);
         next();
     }
     next();
@@ -54,7 +54,6 @@ userSchema.methods.generateAccessToken = function () {
         {
             _id: this._id,
             email: this.email,
-            username: this.username,
             fullName: this.fullName
         },
         process.env.ACCESS_TOKEN_SECRET,
