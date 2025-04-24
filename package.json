@@ -1,0 +1,31 @@
+{
+  "name": "smart_attendance_backend",
+  "version": "1.0.0",
+  "description": "Smart attendance system to mark your attendance only inside the college premises",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon -r dotenv/config src/index.js"
+  },
+  "keywords": [
+    "freelance",
+    "backend",
+    "smart_attendance"
+  ],
+  "author": "Md Aftab Alam",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.13.2",
+    "node-cron": "^3.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
