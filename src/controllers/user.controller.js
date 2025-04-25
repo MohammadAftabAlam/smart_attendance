@@ -4,6 +4,8 @@ import { ApiError } from '../utils/ApiError.js'
 import { User } from "../models/user.model.js"
 import { ApiResponse } from '../utils/ApiResponse.js';
 
+import bcrypt from 'bcrypt';
+
 
 const generateAccessAndRefreshTokens = async (userId) => {
     try {
@@ -188,4 +190,46 @@ const getUserDetails = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, user, "User details fetched successfully"));
 });
 
-export { registerUser, loginUser, logoutUser, getUserDetails }
+
+const changePassword = asyncHandler(async (req, res) => {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user._id; // From auth middleware
+
+    // 1. Validate input
+    if (!currentPassword || !newPassword) {
+        throw new ApiError(400, "Both current and new passwords are required");
+    }
+
+    if (currentPassword === newPassword) {
+        throw new ApiError(400, "New password must be different from current password");
+    }
+
+    // 2. Find user
+    const user = await User.findById(userId);
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    // 3. Verify current password
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isPasswordValid) {
+        throw new ApiError(401, "Current password is incorrect");
+    }
+
+    // 4. Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword.trim(), 10);
+
+    // 5. Update password
+    user.password = hashedPassword;
+    await user.save({ validateBeforeSave: false });
+
+    // 6. Invalidate old tokens (optional)
+    user.refreshToken = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, {}, "Password changed successfully"));
+});
+
+export { registerUser, loginUser, logoutUser, getUserDetails, changePassword }
